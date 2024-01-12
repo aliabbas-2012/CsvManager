@@ -5,19 +5,18 @@ class CsvManager
 
   public function __construct($file)
   {
-    global $mapping_casting;
-    $fileName = $file;
-    $fileHandle = fopen($fileName, "r");
+    $file_name = $file;
+    $file_handle = fopen($file_name, "r");
 
-    while (!feof($fileHandle)) {
-      $csvArray[] = fgetcsv($fileHandle, 1000, ",");
+    while (!feof($file_handle)) {
+      $csvArray[] = fgetcsv($file_handle, 1000, ",");
     }
 
-    fclose($fileHandle);
+    fclose($file_handle);
     $header = array_shift($csvArray);
-    $headerFormat = array_map([$this, "snakeFormat"], $header);
+    $header_format = array_map([$this, "snakeFormat"], $header);
 
-    $this->data = $this->convertArray($headerFormat, $csvArray, $mapping_casting);
+    $this->data = $this->convertArray($header_format, $csvArray);
   }
 
   private function snakeFormat($label)
@@ -26,36 +25,19 @@ class CsvManager
     return preg_replace("/[^\w\s]/", "", $label);
   }
 
-  private function convertArray($header, $data, $mapping)
+  private function convertArray($header, $data)
   {
     $result = [];
 
     foreach ($data as $row) {
       if (is_array($row)) {
-        $combinedArray = array_combine($header, $row);
-        foreach ($combinedArray as $key => &$value) {
-          $value = $this->convertValue($value, $mapping[$key]);
-        }
-        unset($value); // Unset reference to avoid potential issues
-        $result[] = $combinedArray;
+        $combined_array = array_combine($header, $row);
+        unset($value);
+        $result[] = $combined_array;
       }
     }
 
     return $result;
-  }
-
-  private function convertValue($value, $type)
-  {
-    switch ($type) {
-      case "string":
-        return (string)$value;
-      case "int":
-        return (int)$value;
-      case "float":
-        return (float)$value;
-      default:
-        return $value;
-    }
   }
 
   public function getData()
@@ -63,5 +45,4 @@ class CsvManager
     return $this->data;
   }
 }
-
 ?>

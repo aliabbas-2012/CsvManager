@@ -6,12 +6,12 @@ class MySQLManager
 
     private function __construct()
     {
-        $dbHost = $_ENV["DB_HOST"];
-        $dbUser = $_ENV["DB_USER"];
-        $dbPass = $_ENV["DB_PASS"];
-        $dbName = $_ENV["DB_NAME"];
+        $db_host = $_ENV["DB_HOST"];
+        $db_user = $_ENV["DB_USER"];
+        $db_pass = $_ENV["DB_PASS"];
+        $db_name = $_ENV["DB_NAME"];
 
-        self::$conn = new mysqli($dbHost, $dbUser, $dbPass, $dbName);
+        self::$conn = new mysqli($db_host, $db_user, $db_pass, $db_name);
 
         if (self::$conn->connect_error) {
             die("Connection failed: " . self::$conn->connect_error);
@@ -38,38 +38,37 @@ class MySQLManager
         $table_name = $_ENV["TABLE_NAME"];
 
         if (!$this->isTableExist($table_name)) {
-
-            $this->createTable($table_name);
+            $this->createTable($table_name,$csv_data_array[0]);
         } else {
             $this->modifyTable($csv_data_array, $conn, $table_name);
         }
 
 //        it includes data inserts and updates
-        $existing_db_data = $this->getDbData($table_name);
-        $this->performDmlOperation($csv_data_array, $existing_db_data);
+        $this->performDmlOperation($csv_data_array, $table_name);
     }
 
     private function modifyTable($csv_data_array, $conn, $table_name)
     {
-        $csvColumns = array_keys($csv_data_array[0]);
-        $dbColumns = $this->getDbColumns($table_name);
+        $csv_columns = array_keys($csv_data_array[0]);
+        $db_columns = $this->getDbColumns($table_name);
 
-        $addedColumns = array_diff($csvColumns, $dbColumns);
-        $removedColumns = array_diff($dbColumns, $csvColumns);
+        $added_columns = array_diff($csv_columns, $db_columns);
+        $removed_columns = array_diff($db_columns, $csv_columns);
 
-        if (!empty($addedColumns)) {
-            $this->addColumns($table_name, $addedColumns, $conn);
+        if (!empty($added_columns)) {
+            $this->addColumns($table_name, $added_columns,$csv_data_array[0] ,$conn);
         }
 
-        if (!empty($removedColumns)) {
-            $this->removeColumns($table_name, $removedColumns, $conn);
+        if (!empty($removed_columns)) {
+            $this->removeColumns($table_name, $removed_columns, $conn);
         }
     }
 
-    private function addColumns($table_name, $columns, $conn)
+    private function addColumns($table_name, $columns,$csv_columns, $conn)
     {
         foreach ($columns as $column) {
-            $sql = "ALTER TABLE $table_name ADD COLUMN $column VARCHAR(255)";
+            $data_type = $this->getDataType($csv_columns[$column]);
+            $sql = "ALTER TABLE $table_name ADD COLUMN $column $data_type";
             $conn->query($sql);
         }
     }
@@ -90,24 +89,26 @@ class MySQLManager
         return $result->num_rows > 0;
     }
 
-    private function createTable($table_name)
+    private function createTable($table_name,$csv_columns)
     {
         $conn = self::getConnection();
         $sql = "CREATE TABLE IF NOT EXISTS $table_name (";
-        foreach (MAPPING_COLUMN as $columnName => $columnType) {
-            $sql .= "$columnName $columnType, ";
+        foreach ($csv_columns as $column_name => $column_type) {
+            $data_type=$this->getDataType($column_type);
+            $sql .= "$column_name $data_type, ";
         }
         $sql = rtrim($sql, ", ") . ")";
         $conn->query($sql);
     }
 
-    private function performDmlOperation($csv_data_array, $existing_db_data)
+    private function performDmlOperation($csv_data_array, $table_name)
     {
+        $existing_db_data = $this->getDbData($table_name);
         $table_name = $_ENV["TABLE_NAME"];
         $conn = self::getConnection();
-        $csvPrimaryKeys = array_column($csv_data_array, 'id');
-        $dbPrimaryKeys = array_column($existing_db_data, 'id');
-        $idsForDelete = array_diff($dbPrimaryKeys, $csvPrimaryKeys);
+        $csv_primary_keys = array_column($csv_data_array, 'id');
+        $db_primary_keys = array_column($existing_db_data, 'id');
+        $ids_For_Delete = array_diff($db_primary_keys, $csv_primary_keys);
 
         foreach ($csv_data_array as $row) {
             if ($this->isNewRecord($row, $table_name, $conn)) {
@@ -117,7 +118,7 @@ class MySQLManager
             }
         }
 
-        $this->performBulkDeletion($idsForDelete, $table_name, $conn);
+        $this->performBulkDeletion($ids_For_Delete, $table_name, $conn);
 
     }
 
@@ -149,10 +150,10 @@ class MySQLManager
     }
 
 
-    private function performBulkDeletion($idsForDelete, $table_name, $conn){
-        if(!empty($idsForDelete)){
+    private function performBulkDeletion($ids_for_delete, $table_name, $conn){
+        if(!empty($ids_for_delete)){
 
-            $sql = "DELETE FROM $table_name WHERE id IN(".implode(",", $idsForDelete).")";
+            $sql = "DELETE FROM $table_name WHERE id IN(".implode(",", $ids_for_delete).")";
             $conn->query($sql);
         }
     }
@@ -187,5 +188,22 @@ class MySQLManager
         }
         return $data;
     }
+    private function getDataType($value) {
+        if (preg_match('#[0-9]#',$value)){
+            return $this->getNumberType($value);
+        }
+        else {
+            return DATA_TYPE_MAPPING["S"];
+        }
+    }
+
+    private function getNumberType($value) {
+        if (ctype_digit($value)) {
+            return DATA_TYPE_MAPPING['I'];
+        } else if (preg_match("/^([+-]?(\d+(\.\d*)?|\.\d+)([eE][+-]?\d+)?)$/", $value)) {
+            return DATA_TYPE_MAPPING['F'];
+        }
+    }
 }
 ?>
+

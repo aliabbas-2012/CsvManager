@@ -30,93 +30,86 @@ function createHeaders($data)
     return $keys;
 }
 
-function createRows($data){
-    $rows=[];
-    for($i=0; $i<count($data); $i++){
-        $subrow=[];
-        foreach($data[$i] as $key=>$value){
-            if ($key=='name'){
-                $subrow=array_merge($subrow,getFirstAndLastName($value));
-            }
-            elseif($key=='dob'){
-                $subrow=array_merge($subrow,calculateAge($value));
-            }
-            elseif($key=='subjects'){
-                $subrow=array_merge($subrow,getSubjects($value));
-
-            }
-            elseif($key=='educations'){
-                $subrow=array_merge($subrow,getEducations($value));
-
-            }
-            elseif($key=='residence'){
-                $subrow=array_merge($subrow,getResidence($value));
+function createRows($data)
+{
+    $rows = [];
+    for ($i = 0; $i < count($data); $i++) {
+        $subrow = [];
+        foreach ($data[$i] as $key => $value) {
+            if ($key == 'name') {
+                $subrow = array_merge($subrow, getFirstAndLastName($value));
+            } elseif ($key == 'dob') {
+                $subrow = array_merge($subrow, calculateAge($value));
+            } elseif ($key == 'subjects') {
+                $subrow = array_merge($subrow, getSubjects($value));
+            } elseif ($key == 'educations') {
+                $subrow = array_merge($subrow, getEducations($value));
+            } elseif ($key == 'residence') {
+                $subrow = array_merge($subrow, getResidence($value));
             }
         }
-        $rows[]=$subrow;
-
+        $rows[] = $subrow;
     }
     return $rows;
-
 }
 
-function createHeaders1($data, $mapping){
-    $header=[];
-    foreach($data as $key => $value){
-        if(array_key_exists($key,$mapping)){
-            $header=array_merge($header,$mapping[$key]);
-        }
-        else{
-            $header[]=$key;
+function createHeaders1($data)
+{
+    $header = [];
+    foreach ($data as $key => $value) {
+        if (array_key_exists($key, MAPPING)) {
+            $header = array_merge($header, MAPPING[$key]);
+        } else {
+            $header[] = $key;
         }
     }
     return $header;
 }
 
-function getFirstAndLastName($name) {
-    $name=explode(" ",$name);
-    $firstname=$name[0];
-    $lastname=$name[count($name)-1];
-    return [$firstname,$lastname];
+function getFirstAndLastName($name)
+{
+    $name_parts = explode(" ", $name);
+    $first_name = $name_parts[0];
+    $last_name = $name_parts[count($name_parts) - 1];
+    return [$first_name, $last_name];
 }
 
-function calculateAge($birthDate){
-     $birthDateTime = new DateTime($birthDate);
-     $currentDate = new DateTime();
-     $ageInterval = $currentDate->diff($birthDateTime);
-     $age = $ageInterval->y;
-
-     return [$birthDate,$age];
- }
-
-function getSubjects($subjects) {
-    $subjectsCount=count($subjects);
-    $concatSubjects=implode(' | ',$subjects);
-    $formatSubjects = sprintf('%u (%s)',$subjectsCount,$concatSubjects);
-    return [$formatSubjects];
-
+function calculateAge($birthDate)
+{
+    $birth_date_time = new DateTime($birthDate);
+    $current_date = new DateTime();
+    $age_interval = $current_date->diff($birth_date_time);
+    $age = $age_interval->y;
+    return [$birthDate, $age];
 }
 
-function getEducations($educations){
-    
-        $educationList=[];
-        foreach($educations[0] as $key=>$value){
-            $educationItem= array_column($educations,$key);
-            print_r($educationItem);
-            $educationList=array_merge($educationList,[$educationItem]);
+function getSubjects($subjects)
+{
+    $subjects_count = count($subjects);
+    $concat_subjects = implode(' | ', $subjects);
+    $format_subjects = sprintf('%u (%s)', $subjects_count, $concat_subjects);
+    return [$format_subjects];
+}
+
+function getEducations($educations)
+{
+    $education_list = [];
+    foreach ($educations[0] as $key => $value) {
+        $education_item = array_column($educations, $key);
+        print_r($education_item);
+        $education_list = array_merge($education_list, [$education_item]);
     }
-    $educationitems=array_map('implodeList',$educationList);
-    
-    return $educationitems;
+    $education_items = array_map('implodeList', $education_list);
+    return $education_items;
 }
 
-function getResidence($residence){
+function getResidence($residence)
+{
     return array_values($residence);
 }
 
-function implodeList($educationArray){
-    return implode(' | ',$educationArray);
+function implodeList($educationArray)
+{
+    return implode(' | ', $educationArray);
 }
 ?>
-
-

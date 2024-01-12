@@ -1,6 +1,6 @@
 <?php
-include "_function.php";
-include "_mapping.php";
+include "helpers/_function.php";
+include "config/_mapping.php";
 $data = [
     [
         "name" => "Ali Abbas", // first name and last name
@@ -10,12 +10,12 @@ $data = [
             [
                 "university" => "AX",
                 "location" => "Lahore",
-                "degreee" => "BS in IT",
+                "degree" => "BS in IT",
             ],
             [
                 "university" => "AX",
                 "location" => "Lahore",
-                "degreee" => "MS in IT",
+                "degree" => "MS in IT",
             ],
         ], // Educations (Unversity Name, University Location)
         // AX | BX , Lahore | Karachi,  BS in IT| MS in IT
@@ -32,12 +32,12 @@ $data = [
             [
                 "university" => "IUB",
                 "location" => "Bahawalnagar",
-                "degreee" => "BSCS",
+                "degree" => "BSCS",
             ],
             [
                 "university" => "AX",
                 "location" => "Lahore",
-                "degreee" => "BS in IT",
+                "degree" => "BS in IT",
             ],
         ],
         "residence" => [
@@ -202,12 +202,12 @@ $data = [
         ],
     ],
 ];
-$csvheader = createHeaders1($data[0],$mapping);
-$csvrows = createRows($data);
-$array2d=array_merge([$csvheader],$csvrows);
-$fp = fopen("persons3.csv", "w");
-print_r($array2d);
-foreach ($array2d as $fields) {
+$csv_header = createHeaders1($data[0]);
+$csv_rows = createRows($data);
+$array_2d=array_merge([$csv_header],$csv_rows);
+$fp = fopen("persons4.csv", "w");
+print_r($array_2d);
+foreach ($array_2d as $fields) {
     fputcsv($fp, $fields);
 }
 
