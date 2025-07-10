@@ -1,31 +1,86 @@
 # PHP CSV Database Utility
 
-This project provides two PHP command-line utilities:
+This repository contains two PHP CLI tools designed for beginner-to-intermediate developers to interact with CSV data and MySQL databases.
 
-1. **database_system.php** – A beginner-to-intermediate level tool to interact with MySQL using flat CSV files.
-2. **array_to_csv.php** – A utility to export complex PHP arrays as CSV files.
+---
 
-## Features
+## 📂 Features
 
-### `database_system.php`
-- Reads CSV from `storage/csv/example.csv`
+### 1. `database_system.php`
+
+- Reads flat CSV files from `storage/csv/example.csv`
+- Automatically creates or alters MySQL tables
 - Performs:
-  - Table creation or alteration
-  - Record insertion
-  - Record updates
-  - Record deletions
-- Uses helper modules under `/helpers` and configuration from `/config`
+  - `INSERT`
+  - `UPDATE`
+  - `DELETE`
+- Uses helper modules from the `/helpers` directory
+- DB connection is configured via `.env` file
 
-### `array_to_csv.php`
-- Generates CSV from a nested PHP array
-- Outputs to `persons4.csv`
+### 2. `array_to_csv.php`
 
-## Requirements
+- Converts complex PHP arrays into CSV format
+- Outputs a file like `persons4.csv`
+
+---
+
+## 🧾 Folder Structure
+
+```
+project-root/
+│
+├── config/                # Column mappings and demo data
+├── helpers/               # Utility functions for CSV and DB
+├── storage/csv/           # Location for input/output CSV files
+├── vendor/                # Composer dependencies
+│
+├── composer.json
+├── database_system.php    # CLI for DB sync from CSV
+├── array_to_csv.php       # CLI to convert array to CSV
+```
+
+---
+
+## 🛠 Requirements
+
 - PHP 7.4+
-- Composer dependencies (already included)
-- MySQL server (for `database_system.php`)
-- `.env` file with DB connection variables
+- MySQL Server
+- Composer (if not using vendor folder)
 
-## Installation
+---
+
+## ⚙ Setup
+
+1. Install dependencies (optional if `vendor` is included):
+   ```bash
+   composer install
+   ```
+
+2. Create a `.env` file in the project root:
+   ```dotenv
+   DB_HOST=localhost
+   DB_USER=root
+   DB_PASS=your_password
+   DB_NAME=test_db
+   ```
+
+---
+
+## ▶ Usage
+
+Run via terminal:
+
 ```bash
-composer install
+php database_system.php
+php array_to_csv.php
+```
+
+---
+
+## 📜 License
+
+MIT License – see the [LICENSE](LICENSE) file for details.
+
+---
+
+☕ Enjoy the code!
