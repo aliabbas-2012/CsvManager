@@ -1,33 +1,15 @@
 <?php
 function createHeaders($data)
 {
-    $keys = [];
+    $header = [];
     foreach ($data as $key => $value) {
-        if (!is_array($value)) {
-            if ($key == "name") {
-                $keys[] = "first name";
-                $keys[] = "last name";
-            } elseif ($key == "dob") {
-                $keys[] = "dob";
-                $keys[] = "calculated age";
-            } else {
-                $keys[] = $key;
-            }
+        if (array_key_exists($key, MAPPING)) {
+            $header = array_merge($header, MAPPING[$key]);
         } else {
-            if (array_key_first($value) === 0) {
-                if (is_string($value[0])) {
-                    $keys = array_merge($keys, [$key]);
-                } else {
-                    foreach ($value as $item) {
-                        $keys = array_merge($keys, createHeaders($item));
-                    }
-                }
-            } else {
-                $keys = array_merge($keys, array_keys($value));
-            }
+            $header[] = $key;
         }
     }
-    return $keys;
+    return $header;
 }
 
 function createRows($data)
@@ -53,18 +35,7 @@ function createRows($data)
     return $rows;
 }
 
-function createHeaders1($data)
-{
-    $header = [];
-    foreach ($data as $key => $value) {
-        if (array_key_exists($key, MAPPING)) {
-            $header = array_merge($header, MAPPING[$key]);
-        } else {
-            $header[] = $key;
-        }
-    }
-    return $header;
-}
+
 
 function getFirstAndLastName($name)
 {

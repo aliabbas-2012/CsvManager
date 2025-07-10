@@ -68,6 +68,7 @@ class MySQLManager
     {
         foreach ($columns as $column) {
             $data_type = $this->getDataType($csv_columns[$column]);
+
             $sql = "ALTER TABLE $table_name ADD COLUMN $column $data_type";
             $conn->query($sql);
         }
@@ -93,8 +94,9 @@ class MySQLManager
     {
         $conn = self::getConnection();
         $sql = "CREATE TABLE IF NOT EXISTS $table_name (";
-        foreach ($csv_columns as $column_name => $column_type) {
-            $data_type=$this->getDataType($column_type);
+
+        foreach ($csv_columns as $column_name => $value) {
+            $data_type = $this->getDataType($value);
             $sql .= "$column_name $data_type, ";
         }
         $sql = rtrim($sql, ", ") . ")";
@@ -127,6 +129,7 @@ class MySQLManager
         $columns = implode(", ", array_keys($row));
         $values = "'" . implode("', '", array_values($row)) . "'";
         $sql = "INSERT INTO $table_name ($columns) VALUES ($values)";
+
         $conn->query($sql);
     }
 
@@ -189,7 +192,7 @@ class MySQLManager
         return $data;
     }
     private function getDataType($value) {
-        if (preg_match('#[0-9]#',$value)){
+        if (preg_match('#[0-9a-zA-Z]#', $value)) {
             return $this->getNumberType($value);
         }
         else {
@@ -200,8 +203,16 @@ class MySQLManager
     private function getNumberType($value) {
         if (ctype_digit($value)) {
             return DATA_TYPE_MAPPING['I'];
-        } else if (preg_match("/^([+-]?(\d+(\.\d*)?|\.\d+)([eE][+-]?\d+)?)$/", $value)) {
+        }
+        else if(preg_match('/^\d{4}-\d{2}-\d{2}$/', $value)) {
+
+            return DATA_TYPE_MAPPING["D"];
+        }
+        else if (preg_match("/^([+-]?(\d+(\.\d*)?|\.\d+)([eE][+-]?\d+)?)$/", $value)) {
             return DATA_TYPE_MAPPING['F'];
+        }
+        else {
+            return DATA_TYPE_MAPPING["S"];
         }
     }
 }

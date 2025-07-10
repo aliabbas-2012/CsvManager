@@ -8,7 +8,8 @@ $mapping=[
 $data_type_mapping = [
   "F" => "float",
   "I" => "int",
-  "S" => "varchar(255)"
+  "S" => "varchar(255)",
+  "D" => "DATE"
 ];
 define('MAPPING',$mapping);
 define('DATA_TYPE_MAPPING', $data_type_mapping);
