@@ -1,0 +1,31 @@
+# PHP CSV Database Utility
+
+This project provides two PHP command-line utilities:
+
+1. **database_system.php** – A beginner-to-intermediate level tool to interact with MySQL using flat CSV files.
+2. **array_to_csv.php** – A utility to export complex PHP arrays as CSV files.
+
+## Features
+
+### `database_system.php`
+- Reads CSV from `storage/csv/example.csv`
+- Performs:
+  - Table creation or alteration
+  - Record insertion
+  - Record updates
+  - Record deletions
+- Uses helper modules under `/helpers` and configuration from `/config`
+
+### `array_to_csv.php`
+- Generates CSV from a nested PHP array
+- Outputs to `persons4.csv`
+
+## Requirements
+- PHP 7.4+
+- Composer dependencies (already included)
+- MySQL server (for `database_system.php`)
+- `.env` file with DB connection variables
+
+## Installation
+```bash
+composer install

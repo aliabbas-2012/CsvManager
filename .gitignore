@@ -1,6 +1,5 @@
 .env
-storage/*
 vendor/*
 composer.lock
 .idea/*
-*.csv
+persons4.csv
